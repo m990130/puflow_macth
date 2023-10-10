@@ -5,12 +5,20 @@ import warnings
 
 from torch import Tensor
 
+
+# we should maybe replace with Faiss Index
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     from knn_cuda import KNN
 
 from pointnet2_ops.pointnet2_utils import furthest_point_sample, gather_operation
 from modules.utils.fps import farthest_point_sampling as torch_fps, index_points as torch_pindex
+
+# alternatively write our own knn
+def knn_own(pc,n_neighbors=32):  
+    dist = torch.cdist(pc,pc) 
+    neigbhors = dist.topk(k=n_neighbors,dim=2,largest=False) 
+    return neigbhors.indices
 
 
 

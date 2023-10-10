@@ -5,11 +5,10 @@ import warnings
 import os
 
 import torch.nn as nn
-
 from typing import List
 from torch import Tensor
 
-from kaolin.metrics.pointcloud import chamfer_distance as history_chamfer_distance
+
 from metric.emd.emd_module import emdFunction
 from pytorch3d.loss import chamfer_distance
 
@@ -29,16 +28,20 @@ class EarthMoverDistance(nn.Module):
         return torch.sum(loss)
 
 # -----------------------------------------------------------------------------------------
-class ChamferCUDA2(nn.Module):
+if False:
+    class ChamferCUDA2(nn.Module):
 
-    def forward(self, points1, points2):
-        cost = history_chamfer_distance(points1, points2)
-        return torch.sum(cost)
+        raise NotImplementedError
+        from kaolin.metrics.pointcloud import chamfer_distance as history_chamfer_distance
 
-# # -----------------------------------------------------------------------------------------
-class ChamferCUDA(nn.Module):
+        def forward(self, points1, points2):
+            cost = history_chamfer_distance(points1, points2)
+            return torch.sum(cost)
 
-    def forward(self, xyz1: Tensor, xyz2: Tensor, nxyz1: Tensor = None, nxyz2: Tensor = None):
-        return chamfer_distance(xyz1, xyz2, x_normals=nxyz1, y_normals=nxyz2, batch_reduction='mean', point_reduction='mean')
+    # # -----------------------------------------------------------------------------------------
+    class ChamferCUDA(nn.Module):
+
+        def forward(self, xyz1: Tensor, xyz2: Tensor, nxyz1: Tensor = None, nxyz2: Tensor = None):
+            return chamfer_distance(xyz1, xyz2, x_normals=nxyz1, y_normals=nxyz2, batch_reduction='mean', point_reduction='mean')
 
 

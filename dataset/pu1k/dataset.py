@@ -10,7 +10,7 @@ logging.getLogger("tensorflow").setLevel(logging.ERROR)
 import tensorflow as tf
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-tf.enable_resource_variables()
+tf.compat.v1.enable_resource_variables()
 
 from torch.utils.data import DataLoader
 from omegaconf.dictconfig import DictConfig
