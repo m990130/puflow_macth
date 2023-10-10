@@ -11,7 +11,7 @@ Official PyTorch implementation of our TVCG paper: [[Paper & Supplement]](https:
 First clone the code of this repo:
 
 ```bash
-git clone --recursive https://github.com/unknownue/puflow
+git clone --recursive https://github.com/m990130/puflow_macth.git
 ```
 
 Then other settings can be either configured manually or set up with docker.
@@ -22,11 +22,28 @@ The code is implemented with CUDA 11.1, Python 3.8, PyTorch 1.8.0.
 
 Other require libraries:
 
-- pytorch-lightning==1.2.2 for training
-- tensorflow==1.14.0 for dataset loading
-- torchdiffeq form https://github.com/rtqichen/torchdiffeq
-- pytorch3d from https://github.com/facebookresearch/pytorch3d
-- knn_cuda from https://github.com/unlimblue/KNN_CUDA
+```
+conda create -n envname python=3.8
+conda activate envname
+conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=11.1 pytorch-lightning==1.5.0 tensorflow=2.4.0 -c pytorch -c conda-forge
+
+# for pytorch3d dependency
+conda install -c fvcore -c iopath -c conda-forge fvcore iopath omegaconf
+# https://github.com/facebookresearch/pytorch3d/issues/1013 can be solved by importing torch before pytroch3d
+conda install pytorch3d -c pytorch3d
+
+# for the newest torchdiffeq
+pip install git+https://github.com/rtqichen/torchdiffeq
+
+# For the knn_cuda
+# put the ninja either under /username/bin or /username/.local/bin/
+# probably we can replace it with Faiss
+wget -P /username/.local/bin/ https://github.com/unlimblue/KNN_CUDA/raw/master/ninja
+pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.2/KNN_CUDA-0.2-py3-none-any.whl
+
+# the only numpy version found works on tensorflow, ptl and other libraries.
+conda install numpy==1.19.5
+```
 
 ### Docker configuration
 
