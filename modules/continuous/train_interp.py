@@ -15,7 +15,8 @@ from pytorch_lightning.callbacks import LearningRateMonitor
 sys.path.append(os.getcwd())
 
 from dataset.pu1k.dataset import PU1kDataModule, ShotdownDatasetCallback
-from metric.loss import ChamferCUDA, EarthMoverDistance, ChamferCUDA2
+# from metric.loss import ChamferCUDA, EarthMoverDistance, ChamferCUDA2
+from metric.loss import EarthMoverDistance
 
 from modules.continuous.interpflow import PointInterpFlow
 
@@ -36,8 +37,8 @@ class TrainerModule(pl.LightningModule):
         self.network = PointInterpFlow(pc_channel=3)
 
         self.emd_loss = EarthMoverDistance()
-        self.chamfer_loss = ChamferCUDA()
-        self.history_chamfer_loss = ChamferCUDA2()
+        # self.chamfer_loss = ChamferCUDA()
+        # self.history_chamfer_loss = ChamferCUDA2()
 
         self.epoch = 0
         self.min_CD = 20.0
@@ -78,11 +79,12 @@ class TrainerModule(pl.LightningModule):
 
         predict_x, logpx = self(xyz_sparse, upratio=upratio)
         # cd, _ = self.chamfer_loss(predict_x[..., :3], xyz_dense)
-        cd = self.history_chamfer_loss(predict_x[..., :3], xyz_dense)
+        # cd = self.history_chamfer_loss(predict_x[..., :3], xyz_dense)
 
         valid_dict = {
             'vloss': logpx.detach().cpu(),
-            'CD'   : cd,
+            # 'CD'   : cd,
+            'CD'   : [],
         }
  
         return valid_dict
