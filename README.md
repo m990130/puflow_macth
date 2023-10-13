@@ -103,7 +103,12 @@ python modules/continuous/upsample.py \
 
 Evaluation as follows:
 
+make sure to check your `cuda_dir` and symbol link your `libtensorflow_framework.so` correctly as https://github.com/bgshih/aster/issues/56.
+
 ```bash
+# compile the c file for tensorflow to import for evaluation
+# you can check if they are compiled correctly by `python /evaluation/tf_ops/nn_distance/tf_nndistance.py` same for the approax
+bash evaluation/tf_ops/compile.sh linux
 # Build files for evaluation (see build.sh for more details)
 bash evaluation/build.sh
 
@@ -122,17 +127,4 @@ python evaluate.py --pred ./result/ --gt=../data/PU-GAN/GT --save_path=./result/
 
 ## Citation(TODO)
 
-If this work is useful for your research, please consider citing:
 
-```bibtex
-@article{unknownue2022puflow,
-    title={PU-Flow: a Point Cloud Upsampling Network with Normalizing Flows},
-    author={Aihua Mao and Zihui Du and Junhui Hou and Yaqi Duan and Yong-jin Liu and Ying He},
-    journal={IEEE Transactions on Visualization and Computer Graphics},
-    volume={},
-    number={},
-    pages={},
-    year={2022},
-    doi={}
-}
-```
