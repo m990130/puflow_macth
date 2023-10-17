@@ -9,22 +9,27 @@ import logging
 import os
 import sys
 
+
+
+# first change to the PU-GCN env then use the following 
+import tensorflow as tf
+
 sys.path.append(os.path.dirname(os.getcwd()))
-from tf_ops.nn_distance import tf_nndistance
-from tf_ops.approxmatch import tf_approxmatch
+from tf_ops_GCN.nn_distance import tf_nndistance
+from tf_ops_GCN.approxmatch import tf_approxmatch
 from sklearn.neighbors import NearestNeighbors
 
 import math
 from time import time
 from jsd import jsd_between_point_cloud_sets
 
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 logging.getLogger("tensorflow").setLevel(logging.ERROR)
-import tensorflow as tf
+# import tensorflow as tf
 
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_resource_variables()
 
 
@@ -42,7 +47,8 @@ def load_xyz(filename, count=None):
             # different to pointnet2, take random x point instead of the first
             # idx = np.random.permutation(count)
             # points = points[idx, :]
-            points = downsample_points(points, count)
+            # points = downsample_points(points, count)
+            assert False, "not implemented"
     return points
 
 def normalize_point_cloud(pc):
@@ -91,7 +97,7 @@ def np_normalize(pts):
 	return pts * 0.5
 
 
-gt = load(gt_paths[0])[:, :3]
+gt = load_xyz(gt_paths[0])[:, :3]
 pred_placeholder = tf.placeholder(tf.float32, [1, gt.shape[0], 3])
 gt_placeholder = tf.placeholder(tf.float32, [1, gt.shape[0], 3])
 pred_tensor, centroid, furthest_distance = normalize_point_cloud(pred_placeholder)
@@ -115,7 +121,7 @@ def cal_nearest_distance(queries, pc, k=2):
 
 def analyze_uniform(idx_file,radius_file,map_points_file):
     start_time = time()
-    points = load(map_points_file)[:,4:]
+    points = load_xyz(map_points_file)[:,4:]
     radius = np.loadtxt(radius_file)
     print('radius:',radius)
     with open(idx_file) as f:
@@ -182,6 +188,11 @@ with tf.Session() as sess:
         avg_hd_value = 0
         avg_emd_value = 0
         pred_paths = glob(os.path.join(D, "*.xyz"))
+        print("*********************************\n")
+        print(pred_paths)
+        print(PRED_DIR)
+        print("*********************************\n")
+        exit()
 
         gt_pred_pairs = []
         for p in pred_paths:
@@ -217,7 +228,7 @@ with tf.Session() as sess:
             for gt_path, pred_path in gt_pred_pairs:
                 # print("Evaluating: ", pred_path)
                 row = {}
-                gt = load(gt_path)[:, :3]
+                gt = load_xyz(gt_path)[:, :3]
                 gt = gt[np.newaxis, ...]
                 pred = load_xyz(pred_path)
                 pred = pred[:, :3]
@@ -245,7 +256,7 @@ with tf.Session() as sess:
 
                 #print(pred_path[:-4] + "_point2mesh_distance.xyz")
                 if os.path.isfile(pred_path[:-4] + "_point2mesh_distance.xyz"):
-                    point2mesh_distance = load(pred_path[:-4] + "_point2mesh_distance.xyz")
+                    point2mesh_distance = load_xyz(pred_path[:-4] + "_point2mesh_distance.xyz")
                     if point2mesh_distance.size > 0:
     	                point2mesh_distance = point2mesh_distance[:, 3]
     	                row["p2f avg"] = np.nanmean(point2mesh_distance)

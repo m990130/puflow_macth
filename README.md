@@ -25,7 +25,9 @@ Other require libraries:
 ```
 conda create -n envname python=3.8
 conda activate envname
-conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=11.1 pytorch-lightning==1.5.0 tensorflow=2.4.0 -c pytorch -c conda-forge
+conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=11.1 pytorch-lightning==1.5.0 -c pytorch -c conda-forge
+# it might be different version for TF, check the cuda version and other dependency conflicts.
+conda install tensorflow-gpu==2.4.0
 
 # for pytorch3d dependency
 conda install -c fvcore -c iopath -c conda-forge fvcore iopath omegaconf
@@ -72,7 +74,7 @@ All training and evaluation data can be downloaded from this [link](https://driv
 
 We include some [pretrained x4 models](pretrain/) in this repo.
 
-## Training & Upsampling & Evaluation
+## Training & Upsampling
 
 Train the model on specific dataset:
 
@@ -101,14 +103,16 @@ python modules/continuous/upsample.py \
     --up_ratio=4
 ```
 
-Evaluation as follows:
-
-make sure to check your `cuda_dir` and symbol link your `libtensorflow_framework.so` correctly as https://github.com/bgshih/aster/issues/56.
+## Evaluation
+Things become a bit tricky here, as the dependency is a total mess from the puflow. Easiest way to do it is to switch to the conda env of [PU-GCN](https://github.com/guochengqian/PU-GCN). So the steps are:  
+1. Create a new environment according to the PU-GCN. (it is much easier than installing the puflow env).
+2. switch to that conda environment.
+3. make sure to check your `cuda_dir` is correct in file `evaluation/tf_ops_GCN/compile.sh` and run
 
 ```bash
 # compile the c file for tensorflow to import for evaluation
 # you can check if they are compiled correctly by `python /evaluation/tf_ops/nn_distance/tf_nndistance.py` same for the approax
-bash evaluation/tf_ops/compile.sh linux
+bash evaluation/tf_ops_GCN/compile.sh linux
 # Build files for evaluation (see build.sh for more details)
 bash evaluation/build.sh
 
@@ -116,7 +120,7 @@ bash evaluation/build.sh
 cd evaluation/
 cp path/to/output/directory/**.xyz ./result/
 bash eval_pu1k.sh
-python evaluate.py --pred ./result/ --gt=../data/PU1K/test/input_2048/gt_8192 --save_path=./result/
+python evaluate.py --pred ./result/ --gt=../data/PU1K/GT --save_path=./result/
 
 # Evaluate on PU-GAN dataset
 cd evaluation/
