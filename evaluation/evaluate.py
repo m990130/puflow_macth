@@ -88,13 +88,13 @@ gt_names = [os.path.basename(p)[:-4] for p in gt_paths]
 
 
 def np_normalize(pts):
-	centroid = np.mean(pts, axis=1, keepdims=True)
-	
-	pts = pts - centroid
-	furthest = np.amax(np.sqrt(np.sum(pts ** 2, axis=-1)), axis=1, keepdims=True)
-	pts = pts / np.expand_dims(furthest, axis=-1)
-	# print(np.min(pts), np.max(pts))
-	return pts * 0.5
+    centroid = np.mean(pts, axis=1, keepdims=True)
+    
+    pts = pts - centroid
+    furthest = np.amax(np.sqrt(np.sum(pts ** 2, axis=-1)), axis=1, keepdims=True)
+    pts = pts / np.expand_dims(furthest, axis=-1)
+    # print(np.min(pts), np.max(pts))
+    return pts * 0.5
 
 
 gt = load_xyz(gt_paths[0])[:, :3]
@@ -134,7 +134,7 @@ def analyze_uniform(idx_file,radius_file,map_points_file):
 
     densitys = np.zeros([rad_number,sample_number])
 
-	
+    
     expect_number = precentages * points.shape[0]
     expect_number = np.reshape(expect_number, [rad_number, 1])
 
@@ -188,11 +188,7 @@ with tf.Session() as sess:
         avg_hd_value = 0
         avg_emd_value = 0
         pred_paths = glob(os.path.join(D, "*.xyz"))
-        print("*********************************\n")
-        print(pred_paths)
-        print(PRED_DIR)
-        print("*********************************\n")
-        exit()
+
 
         gt_pred_pairs = []
         for p in pred_paths:
@@ -258,22 +254,22 @@ with tf.Session() as sess:
                 if os.path.isfile(pred_path[:-4] + "_point2mesh_distance.xyz"):
                     point2mesh_distance = load_xyz(pred_path[:-4] + "_point2mesh_distance.xyz")
                     if point2mesh_distance.size > 0:
-    	                point2mesh_distance = point2mesh_distance[:, 3]
-    	                row["p2f avg"] = np.nanmean(point2mesh_distance)
-    	                row["p2f std"] = np.nanstd(point2mesh_distance)
-    	                global_p2f.append(point2mesh_distance)
+                        point2mesh_distance = point2mesh_distance[:, 3]
+                        row["p2f avg"] = np.nanmean(point2mesh_distance)
+                        row["p2f std"] = np.nanstd(point2mesh_distance)
+                        global_p2f.append(point2mesh_distance)
 
-    	                row["JSD"] = jsd_value
-    	                if os.path.isfile(pred_path[:-4] + "_disk_idx.txt"):
-    	                
-    	                    idx_file = pred_path[:-4] + "_disk_idx.txt"
-    	                    radius_file = pred_path[:-4] + '_radius.txt'
-    	                    map_points_file = pred_path[:-4] + '_point2mesh_distance.txt'
-    	                    
-    	                    disk_measure = analyze_uniform(idx_file, radius_file, map_points_file)
-    	                    global_uniform.append(disk_measure)
+                        row["JSD"] = jsd_value
+                        if os.path.isfile(pred_path[:-4] + "_disk_idx.txt"):
+                    
+                            idx_file = pred_path[:-4] + "_disk_idx.txt"
+                            radius_file = pred_path[:-4] + '_radius.txt'
+                            map_points_file = pred_path[:-4] + '_point2mesh_distance.txt'
+                            
+                            disk_measure = analyze_uniform(idx_file, radius_file, map_points_file)
+                            global_uniform.append(disk_measure)
 
-    	                    for i in range(len(precentages)):
+                            for i in range(len(precentages)):
                                 row["uniform_%d" % i] = disk_measure[i, 0]
 
                 writer.writerow(row)
